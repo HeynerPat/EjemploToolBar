@@ -7,9 +7,11 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
-import android.widget.SearchView
+import androidx.appcompat.widget.SearchView
 import android.widget.Toast
+import androidx.appcompat.widget.ShareActionProvider
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.MenuItemCompat
 
 
 class MainActivity : AppCompatActivity() {
@@ -37,25 +39,29 @@ class MainActivity : AppCompatActivity() {
 
         val itemBusqueda = menu?.findItem(R.id.busqueda)
         var vistaBusqueda = itemBusqueda?.actionView as SearchView
+        val itemCompartir = menu?.findItem(R.id.share)
+        val shareActionProvider = MenuItemCompat.getActionProvider(itemCompartir) as ShareActionProvider
+
+        compartirIntent(shareActionProvider)
+
 
         vistaBusqueda.queryHint = "Escribe tu nombre..."
 
-        vistaBusqueda.setOnQueryTextFocusChangeListener{ view, b ->
+        vistaBusqueda.setOnQueryTextFocusChangeListener{ v, hasFocus ->
             Log.d("LISTENERFOCUS", hasWindowFocus().toString())
         }
 
         vistaBusqueda.setOnQueryTextListener(object :  SearchView.OnQueryTextListener {
             override fun onQueryTextChange(p0: String?): Boolean {
-                if(p0 != null){
-                    Log.d("onQueryTextChange",p0)
-                }
+                Log.d("onQueryTextChange", p0.toString())
+
                 return true
             }
 
             override fun onQueryTextSubmit(p0: String?): Boolean {
-                if(p0 != null){
-                    Log.d("onQueryTextSubmit",p0)
-                }
+
+                Log.d("onQueryTextSubmit",p0.toString())
+
                 return true
             }
         })
@@ -71,11 +77,18 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
 
-            else -> {
-                return super.onOptionsItemSelected(item)
-            }
+            else -> {return super.onOptionsItemSelected(item)}
 
         }
 
+    }
+
+    private fun compartirIntent(shareActionProvider: ShareActionProvider){
+        if(shareActionProvider != null){
+            val intent = Intent(Intent.ACTION_SEND)
+            intent.type = "text/plain"
+            intent.putExtra(Intent.EXTRA_TEXT, "Este es un mensaje compartido")
+            shareActionProvider.setShareIntent(intent)
+        }
     }
 }
